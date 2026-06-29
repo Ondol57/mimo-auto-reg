@@ -1,0 +1,20 @@
+{
+  "tempmail": {
+    "apiUrl": "https://tempmail.adrnode.com/api"
+  },
+  "captcha": {
+    "provider": "2captcha",
+    "apiKey": "YOUR_2CAPTCHA_API_KEY"
+  },
+  "xiaomi": {
+    "referralLink": "https://platform.xiaomimimo.com/?ref=XXXXXX",
+    "inviteCode": "XXXXXX",
+    "password": "MimoAuto2024!",
+    "betaApplication": "MiMo-V2.5-Pro-UltraSpeed"
+  },
+  "browser": {
+    "headless": false,
+    "timeout": 60000,
+    "screenshots": false
+  }
+}
