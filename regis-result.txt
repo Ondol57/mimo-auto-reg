@@ -1,0 +1,2 @@
+# Regis loop results. Format: email:password:refCode:apiKey
+alexsetiawan@adrnode.com:MimoAuto2024!:DPWQPR:sk-spot7dmzwv05ijj960sz2vab17h3ii42x01zcyg31834cpun

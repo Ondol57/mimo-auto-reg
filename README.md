@@ -49,6 +49,9 @@ Yang opsional:
 
 ## Run
 
+### Chain Loop
+Mendaftarkan akun dan saling memasukkan kode referral secara berantai (Chain).
+
 ```bash
 node chain-loop.js --count 5
 ```
@@ -69,6 +72,24 @@ node chain-loop.js --count 10 --seed P9LHUK
 # Output ke file lain
 node chain-loop.js --count 3 --output batch1.txt
 ```
+
+### Regis Loop (Tanpa Redeem Referral Code)
+Mendaftarkan akun, mengambil API key, mengisi form Ultraspeed, dan mengambil referral code milik akun baru saja tanpa melakukan redeem referral (skip).
+
+```bash
+node regis-loop.js --count 5
+```
+
+| Flag | Default | Keterangan |
+|---|---|---|
+| `--count N` | 1 | jumlah akun yang dibuat |
+| `--output file.txt` | `regis-result.txt` | file output (format: email:password:refCode:apiKey) |
+
+```bash
+# Membuat 5 akun baru secara bergantian tanpa referral link / redeem code sama sekali
+node regis-loop.js --count 5
+```
+
 
 ## Per-akun flow
 
@@ -182,6 +203,7 @@ Bottleneck utama: solving captcha (60-120s per akun via 2Captcha).
 ```
 ├── chain-loop.js         entry point (node chain-loop.js)
 ├── chain-loop-config.js  CLI args + save/log helpers
+├── regis-loop.js         entry point baru (node regis-loop.js)
 ├── index.js              MimoRegistration core class
 ├── extras.js             getReferralCode method
 ├── fingerprint.js        random browser fingerprint
