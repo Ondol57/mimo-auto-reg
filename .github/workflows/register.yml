@@ -10,11 +10,11 @@ on:
       mode:
         description: 'chain or regis'
         required: true
-        default: 'chain'
+        default: 'regis'
         type: choice
         options:
-          - chain
           - regis
+          - chain
 
 jobs:
   register:
