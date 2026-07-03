@@ -4,16 +4,16 @@
   },
   "captcha": {
     "provider": "2captcha",
-    "apiKey": "YOUR_2CAPTCHA_API_KEY"
+    "apiKey": "dd22eca10ee02b8bfcb0a991ea2099dd"
   },
   "xiaomi": {
-    "referralLink": "https://platform.xiaomimimo.com/?ref=XXXXXX",
-    "inviteCode": "XXXXXX",
+    "referralLink": "https://platform.xiaomimimo.com/?ref=BAHE7L",
+    "inviteCode": "BAHE7L",
     "password": "MimoAuto2024!",
     "betaApplication": "MiMo-V2.5-Pro-UltraSpeed"
   },
   "browser": {
-    "headless": false,
+    "headless": true,
     "timeout": 60000,
     "screenshots": false
   }

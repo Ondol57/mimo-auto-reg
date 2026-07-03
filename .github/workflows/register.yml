@@ -1,0 +1,56 @@
+name: MiMo Auto Register
+
+on:
+  workflow_dispatch:
+    inputs:
+      count:
+        description: 'Number of accounts to create'
+        required: true
+        default: '5'
+      mode:
+        description: 'chain or regis'
+        required: true
+        default: 'chain'
+        type: choice
+        options:
+          - chain
+          - regis
+
+jobs:
+  register:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      
+      - name: Install dependencies
+        run: npm install
+      
+      - name: Install Playwright Chromium
+        run: npx playwright install chromium --with-deps
+      
+      - name: Run registration
+        env:
+          CAPTCHA_KEY: ${{ secrets.CAPTCHA_KEY }}
+        run: |
+          if [ "${{ inputs.mode }}" = "chain" ]; then
+            node chain-loop.js --count ${{ inputs.count }} --output chain-result.txt
+          else
+            node regis-loop.js --count ${{ inputs.count }} --output regis-result.txt
+          fi
+      
+      - name: Upload results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: mimo-results
+          path: |
+            chain-result.txt
+            regis-result.txt
+            *.png
