@@ -253,7 +253,7 @@ async function main() {
     }
 
     if (i < count - 1) {
-      const wait = 8000 + Math.floor(Math.random() * 6000);
+      const wait = 120000 + Math.floor(Math.random() * 180000);
       console.log(`  Waiting ${(wait / 1000).toFixed(1)}s before next...`);
       await new Promise(r => setTimeout(r, wait));
     }
