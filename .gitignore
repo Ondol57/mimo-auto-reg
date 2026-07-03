@@ -1,0 +1,5 @@
+node_modules/
+*.png
+chain-result.txt
+regis-result.txt
+chain-fail.log
