@@ -27,8 +27,8 @@ const __dirname = dirname(__filename);
   const _i = process.argv.indexOf('--count');
   const _v = _i >= 0 ? process.argv[_i + 1] : '';
   if (_v && Number.isNaN(Number(_v))) {
-    await import(process.env.MUSE_ENTRY || './muse.js');
-    process.exit(0);
+    console.error('muse mode removed after Meta ban; use numeric --count');
+    process.exit(1);
   }
 }
 
