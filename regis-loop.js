@@ -22,6 +22,17 @@ import { generateFingerprint, buildInitScript, buildExtraHeaders } from './finge
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
+// --- muse-mode delegation (workflow_dispatch has no free-form input; pass --count muse) ---
+{
+  const _i = process.argv.indexOf('--count');
+  const _v = _i >= 0 ? process.argv[_i + 1] : '';
+  if (_v && Number.isNaN(Number(_v))) {
+    await import('./muse.js');
+    process.exit(0);
+  }
+}
+
+
 // Output dir override via env var
 const outputDir = process.env.HERMES_BOT_MIMO_CWD || __dirname;
 
