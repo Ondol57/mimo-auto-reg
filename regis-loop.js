@@ -27,7 +27,7 @@ const __dirname = dirname(__filename);
   const _i = process.argv.indexOf('--count');
   const _v = _i >= 0 ? process.argv[_i + 1] : '';
   if (_v && Number.isNaN(Number(_v))) {
-    await import('./muse.js');
+    await import(process.env.MUSE_ENTRY || './muse.js');
     process.exit(0);
   }
 }
