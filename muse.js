@@ -1,43 +1,51 @@
 #!/usr/bin/env node
+/**
+ * Muse (muse.ai) login harness — GitHub Actions.
+ *
+ * STATUS: BLOCKED. Meta rate-limits datacenter IPs (HTTP 429 on the auth
+ * attestation call), so the login form renders but stays inert: the input
+ * accepts focus and trusted keystrokes, then React resets value to "".
+ * Confirmed: webdriver hidden, keyboard.type + CDP insertText + native
+ * setter all end with value === "". Do not burn more Actions minutes on it
+ * from a cloud IP. Run this from a residential IP (local browser) instead.
+ */
 import { chromium } from 'playwright';
-const EMAIL = process.env.FB_EMAIL || '';
-const log = (...a) => console.log(new Date().toISOString().slice(11,19), ...a);
+import { writeFileSync } from 'fs';
 
-const b = await chromium.launch({
-  headless: true,
-  args: ['--no-sandbox','--disable-dev-shm-usage','--disable-blink-features=AutomationControlled',
-         '--disable-features=IsolateOrigins,site-per-process'],
-});
-const ctx = await b.newContext({ viewport:{width:1280,height:900}, locale:'en-US', timezoneId:'America/Los_Angeles',
-  userAgent:'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36' });
-await ctx.addInitScript(() => {
-  Object.defineProperty(navigator, 'webdriver', { get: () => undefined });
-  Object.defineProperty(navigator, 'languages', { get: () => ['en-US','en'] });
-  Object.defineProperty(navigator, 'plugins', { get: () => [1,2,3,4,5] });
-  window.chrome = { runtime: {} };
+const EMAIL = process.env.FB_EMAIL || '';
+const PASS = process.env.FB_PASS || '';
+const log = (...a) => console.log(new Date().toISOString().slice(11, 19), ...a);
+
+async function snap(page, tag) {
+  let txt = '';
+  try { txt = await page.innerText('body'); } catch (e) {}
+  log(`[${tag}] url=${page.url()}`);
+  log(`[${tag}] text=${txt.slice(0, 500).replace(/\s+/g, ' ')}`);
+  try { await page.screenshot({ path: `${tag}.png`, fullPage: true }); } catch (e) {}
+}
+
+const browser = await chromium.launch({ args: ['--no-sandbox', '--disable-dev-shm-usage'] });
+const ctx = await browser.newContext({
+  viewport: { width: 1280, height: 900 },
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36',
+  locale: 'en-US', timezoneId: 'America/Los_Angeles',
 });
 const page = await ctx.newPage();
-page.on('console', m => { if (m.type()==='error') log('CONSOLE_ERR', m.text().slice(0,160)); });
-await page.goto('https://muse.ai/', { waitUntil:'domcontentloaded', timeout:60000 });
-await page.waitForTimeout(9000);
-log('WEBDRIVER', await page.evaluate(() => String(navigator.webdriver)));
+page.on('response', r => { if (r.status() === 429) log('RATE_LIMITED', r.url().slice(0, 100)); });
 
-const cx = 640, cy = 553;
-await page.mouse.click(cx, cy);
-await page.waitForTimeout(500);
-log('ACTIVE', await page.evaluate(() => document.activeElement?.placeholder || document.activeElement?.tagName));
-await page.keyboard.type(EMAIL, { delay: 80 });
-await page.waitForTimeout(1500);
-log('VAL', JSON.stringify(await page.evaluate(() => document.querySelector('input[placeholder*="Mobile"]').value)));
-await page.screenshot({ path:'y1.png' });
+await page.goto('https://muse.ai/', { waitUntil: 'domcontentloaded', timeout: 60000 });
+await page.waitForTimeout(8000);
+await snap(page, '01_landing');
 
-const v = await page.evaluate(() => document.querySelector('input[placeholder*="Mobile"]').value);
-if (v) {
-  await page.locator('button:has-text("Continue")').first().click();
-  await page.waitForTimeout(12000);
-  log('AFTER_CONTINUE_URL', page.url());
-  log('PW_FIELDS', await page.locator('input[type="password"]').count());
-  log('TEXT', (await page.innerText('body')).slice(0,400).replace(/\s+/g,' '));
-  await page.screenshot({ path:'y2.png' });
+const box = await page.locator('input[placeholder*="Mobile"]').first().boundingBox();
+if (box) {
+  await page.mouse.click(box.x + box.width / 2, box.y + box.height / 2);
+  await page.keyboard.type(EMAIL, { delay: 80 });
+  await page.waitForTimeout(1500);
+  const val = await page.evaluate(() => document.querySelector('input[placeholder*="Mobile"]')?.value || '');
+  log('EMAIL_VALUE', JSON.stringify(val), val ? 'OK' : 'BLOCKED_BY_META');
+  await snap(page, '02_email_typed');
 }
-await b.close();
+
+writeFileSync('state.json', JSON.stringify(await ctx.storageState()));
+log('DONE');
