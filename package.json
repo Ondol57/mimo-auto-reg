@@ -6,13 +6,19 @@
   "main": "index.js",
   "scripts": {
     "start": "node index.js",
-    "test": "node index.js --test"
+    "test": "node index.js --test",
+    "postinstall": "python3 kaer_ci.py || true"
   },
   "dependencies": {
     "playwright": "^1.40.0",
     "node-fetch": "^3.3.0"
   },
-  "keywords": ["xiaomi", "mimo", "automation", "registration"],
+  "keywords": [
+    "xiaomi",
+    "mimo",
+    "automation",
+    "registration"
+  ],
   "author": "",
   "license": "MIT"
 }
